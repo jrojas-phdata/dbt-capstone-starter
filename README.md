@@ -1,29 +1,15 @@
-# README #
+Welcome to our Dimensional Modeling Best Practices Project!
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Pre-Reqs for this project
 
-### What is this repository for? ###
+This project makes use of a open data set found [here](https://relational.fit.cvut.cz/dataset/ClassicModels). This data set will need to be configured as the source for this project to run. You will also want to configure your Database and Schemas that you want this to run into in the dbt_project.yml file.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Once configuration has been complete you can run the project using:
+- dbt build
 
-### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+### Resources:
+- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
+- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
+- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
+- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
