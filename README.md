@@ -47,7 +47,7 @@ We specialize in a comprehensive range of parts for classic cars, including:
 * **Interior Accessories:** Upholstery, dashboards, and steering wheels.
 * **Suspension and Brakes:** Shocks, springs, and brake components.
 
-Whether you’re restoring a vintage roadster or maintaining a classic muscle car, we have the parts you need to ensure your vehicle runs smoothly and looks its best.
+Whether you're restoring a vintage roadster or maintaining a classic muscle car, we have the parts you need to ensure your vehicle runs smoothly and looks its best.
 
 ---
 
@@ -59,97 +59,98 @@ The first use case will be focused on providing a utilitarian data model that ca
 
 Below you will find the ERD of the custom-built, in-house order processing system used at Classic Car Components:
 
+```mermaid
 erDiagram
     OFFICES {
-        varchar(16777216) OFFICE_CODE PK
-        varchar(16777216) CITY
-        varchar(16777216) PHONE
-        varchar(16777216) ADDRESS_LINE1
-        varchar(16777216) ADDRESS_LINE2
-        varchar(16777216) STATE
-        varchar(16777216) COUNTRY
-        varchar(16777216) POSTAL_CODE
-        varchar(16777216) TERRITORY
-        timestamp_ltz(9) _SYNC_DATE
+        varchar OFFICE_CODE PK
+        varchar CITY
+        varchar PHONE
+        varchar ADDRESS_LINE1
+        varchar ADDRESS_LINE2
+        varchar STATE
+        varchar COUNTRY
+        varchar POSTAL_CODE
+        varchar TERRITORY
+        timestamp_ltz _SYNC_DATE
     }
 
     EMPLOYEES {
-        number(38_0) EMPLOYEE_NUMBER PK
-        varchar(16777216) LAST_NAME
-        varchar(16777216) FIRST_NAME
-        varchar(16777216) EXTENSION
-        varchar(16777216) EMAIL
-        varchar(16777216) OFFICE_CODE FK
-        number(38_0) REPORTS_TO FK
-        varchar(16777216) JOB_TITLE
-        timestamp_ltz(9) _SYNC_DATE
+        number EMPLOYEE_NUMBER PK
+        varchar LAST_NAME
+        varchar FIRST_NAME
+        varchar EXTENSION
+        varchar EMAIL
+        varchar OFFICE_CODE FK
+        number REPORTS_TO FK
+        varchar JOB_TITLE
+        timestamp_ltz _SYNC_DATE
     }
 
     CUSTOMERS {
-        number(38_0) CUSTOMER_NUMBER PK
-        varchar(16777216) CUSTOMER_NAME
-        varchar(16777216) CUSTOMER_LAST_NAME
-        varchar(16777216) CUSTOMER_FIRST_NAME
-        varchar(16777216) PHONE
-        varchar(16777216) ADDRESS_LINE1
-        varchar(16777216) ADDRESS_LINE2
-        varchar(16777216) CITY
-        varchar(16777216) STATE
-        varchar(16777216) POSTAL_CODE
-        varchar(16777216) COUNTRY
-        number(38_0) SALES_REP_EMPLOYEE_NUMBER FK
+        number CUSTOMER_NUMBER PK
+        varchar CUSTOMER_NAME
+        varchar CUSTOMER_LAST_NAME
+        varchar CUSTOMER_FIRST_NAME
+        varchar PHONE
+        varchar ADDRESS_LINE1
+        varchar ADDRESS_LINE2
+        varchar CITY
+        varchar STATE
+        varchar POSTAL_CODE
+        varchar COUNTRY
+        number SALES_REP_EMPLOYEE_NUMBER FK
         float CREDIT_LIMIT
-        timestamp_ltz(9) _SYNC_DATE
+        timestamp_ltz _SYNC_DATE
     }
 
     ORDERS {
-        number(38_0) ORDER_NUMBER PK
+        number ORDER_NUMBER PK
         date ORDER_DATE
         date REQUIRED_DATE
         date SHIPPED_DATE
-        varchar(16777216) STATUS
-        varchar(16777216) COMMENTS
-        number(38_0) CUSTOMER_NUMBER FK
-        timestamp_ltz(9) _SYNC_DATE
+        varchar STATUS
+        varchar COMMENTS
+        number CUSTOMER_NUMBER FK
+        timestamp_ltz _SYNC_DATE
     }
 
     ORDER_DETAILS {
-        number(38_0) ORDER_NUMBER PK,FK
-        varchar(16777216) PRODUCT_CODE PK,FK
-        number(38_0) ORDER_LINE_NUMBER PK
-        number(38_0) QUANTITY_ORDERED
+        number ORDER_NUMBER PK
+        varchar PRODUCT_CODE PK
+        number ORDER_LINE_NUMBER PK
+        number QUANTITY_ORDERED
         float PRICE_EACH
-        timestamp_ltz(9) _SYNC_DATE
+        timestamp_ltz _SYNC_DATE
     }
 
     PRODUCTS {
-        varchar(16777216) PRODUCT_CODE PK
-        varchar(16777216) PRODUCT_NAME
-        varchar(16777216) PRODUCT_LINE FK
-        varchar(16777216) PRODUCT_SCALE
-        varchar(16777216) PRODUCT_VENDOR
-        varchar(16777216) PRODUCT_DESCRIPTION
-        number(38_0) QUANTITY_IN_STOCK
+        varchar PRODUCT_CODE PK
+        varchar PRODUCT_NAME
+        varchar PRODUCT_LINE FK
+        varchar PRODUCT_SCALE
+        varchar PRODUCT_VENDOR
+        varchar PRODUCT_DESCRIPTION
+        number QUANTITY_IN_STOCK
         float BUY_PRICE
         float MSRP
-        timestamp_ltz(9) _SYNC_DATE
-        varchar(16777216) TEXT_DESCRIPTION FK
+        timestamp_ltz _SYNC_DATE
+        varchar TEXT_DESCRIPTION FK
     }
 
     PRODUCT_LINES {
-        varchar(16777216) PRODUCT_LINE PK
-        varchar(16777216) TEXT_DESCRIPTION PK
-        varchar(16777216) HTML_DESCRIPTION
-        binary(8388608) IMAGE
-        timestamp_ltz(9) _SYNC_DATE
+        varchar PRODUCT_LINE PK
+        varchar TEXT_DESCRIPTION PK
+        varchar HTML_DESCRIPTION
+        binary IMAGE
+        timestamp_ltz _SYNC_DATE
     }
 
     PAYMENTS {
-        number(38_0) CUSTOMER_NUMBER PK,FK
-        varchar(16777216) CHECK_NUMBER PK
+        number CUSTOMER_NUMBER PK
+        varchar CHECK_NUMBER PK
         date PAYMENT_DATE
         float AMOUNT
-        timestamp_ltz(9) _SYNC_DATE
+        timestamp_ltz _SYNC_DATE
     }
 
     %% Relationships
@@ -161,85 +162,89 @@ erDiagram
     ORDERS ||--|{ ORDER_DETAILS : "contains"
     PRODUCTS ||--o{ ORDER_DETAILS : "listed in"
     PRODUCT_LINES ||--o{ PRODUCTS : "categorizes"
+```
 
 To accomplish this, the team has decided to utilize dbt on top of Snowflake to create the starting place for a data model that will support reporting on a variety of needs across this data set. After some time meeting with the business and engineers, the Solution Architect returns with the following Snowflake data model:
 
+```mermaid
 erDiagram
     FCT_PAYMENTS {
-        binary(16) CUSTOMER_PK PK,FK
-        varchar(16777216) CHECK_NUMBER PK
+        binary CUSTOMER_PK PK
+        varchar CHECK_NUMBER PK
         date PAYMENT_DATE
         float AMOUNT
     }
 
     DIM_CUSTOMERS {
-        binary(16) CUSTOMER_PK PK
-        varchar(16777216) CUSTOMER_NAME
-        varchar(16777216) CUSTOMER_LAST_NAME
-        varchar(16777216) CUSTOMER_FIRST_NAME
-        number(38_0) SALES_REP_EMPLOYEE_NUMBER
+        binary CUSTOMER_PK PK
+        varchar CUSTOMER_NAME
+        varchar CUSTOMER_LAST_NAME
+        varchar CUSTOMER_FIRST_NAME
+        number SALES_REP_EMPLOYEE_NUMBER
         float CREDIT_LIMIT
-        varchar(16777216) PHONE
-        varchar(16777216) ADDRESS_LINE1
-        varchar(16777216) ADDRESS_LINE2
-        varchar(16777216) CITY
-        varchar(16777216) STATE
-        varchar(16777216) POSTAL_CODE
-        varchar(16777216) COUNTRY
+        varchar PHONE
+        varchar ADDRESS_LINE1
+        varchar ADDRESS_LINE2
+        varchar CITY
+        varchar STATE
+        varchar POSTAL_CODE
+        varchar COUNTRY
     }
 
     DIM_ORDERS {
-        binary(16) ORDER_PK PK
+        binary ORDER_PK PK
         date REQUIRED_DATE
         date SHIPPED_DATE
-        varchar(16777216) STATUS
-        varchar(16777216) COMMENTS
+        varchar STATUS
+        varchar COMMENTS
     }
 
     FCT_ORDERS {
-        binary(16) ORDER_PK PK,FK
-        binary(16) PRODUCT_PK PK,FK
-        binary(16) CUSTOMER_PK PK,FK
-        number(38_0) ORDER_LINE_NUMBER PK
-        varchar(16777216) PRODUCT_CODE
-        number(38_0) QUANTITY_ORDERED
+        binary ORDER_PK PK
+        binary PRODUCT_PK PK
+        binary CUSTOMER_PK PK
+        number ORDER_LINE_NUMBER PK
+        varchar PRODUCT_CODE
+        number QUANTITY_ORDERED
         float PRICE_EACH
     }
 
     DIM_DATE {
         date DATE_DAY PK
-        number(4_0) DATE_YEAR
-        number(2_0) DATE_QUARTER
-        number(2_0) DATE_MONTH
-        number(2_0) DATE_WEEK
-        number(2_0) DATE_DAY_OF_MONTH
+        number DATE_YEAR
+        number DATE_QUARTER
+        number DATE_MONTH
+        number DATE_WEEK
+        number DATE_DAY_OF_MONTH
     }
 
     DIM_PRODUCTS {
-        binary(16) PRODUCT_PK PK
-        varchar(16777216) PRODUCT_NAME
-        varchar(16777216) PRODUCT_LINE
-        varchar(16777216) PRODUCT_SCALE
-        varchar(16777216) PRODUCT_VENDOR
-        varchar(16777216) PRODUCT_DESCRIPTION
+        binary PRODUCT_PK PK
+        varchar PRODUCT_NAME
+        varchar PRODUCT_LINE
+        varchar PRODUCT_SCALE
+        varchar PRODUCT_VENDOR
+        varchar PRODUCT_DESCRIPTION
     }
 
     FCT_PRODUCTS {
-        binary(16) PRODUCT_PK PK,FK
-        number(38_0) QUANTITY_IN_STOCK
+        binary PRODUCT_PK PK
+        number QUANTITY_IN_STOCK
         float BUY_PRICE
         float MSRP
     }
 
-    %% Relationships based on visual connections
+    %% Relationships
     DIM_CUSTOMERS ||--o{ FCT_PAYMENTS : "has payments"
     DIM_CUSTOMERS ||--o{ FCT_ORDERS : "places"
     DIM_ORDERS ||--o{ FCT_ORDERS : "contains"
     DIM_PRODUCTS ||--o{ FCT_ORDERS : "included in"
     DIM_PRODUCTS ||--|| FCT_PRODUCTS : "has inventory facts"
+```
 
 To support the various transformations needed to support this data model, the Architect wants to build out a standard stage/intermediate/model architecture which looks like:
 
+```text
 ├── models
 │   ├── intermediate
 │   │   ├── int_order_details.sql
@@ -260,3 +265,4 @@ To support the various transformations needed to support this data model, the Ar
 │           ├── stg_classic_models__order_details.yml
 │           ├── stg_classic_models__customers.sql
 │           └── stg_classic_models__customers.yml
+```
