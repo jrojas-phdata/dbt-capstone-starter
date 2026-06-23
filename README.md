@@ -13,3 +13,250 @@ Once configuration has been complete you can run the project using:
 - Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
 - Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
 - Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+
+# Project Overview
+
+This capstone project provides the opportunity to demonstrate and improve your skills/abilities with dbt. Within this capstone, you will be presented with a data source ERD and a final ERD of the expected data model. Along with a templated dbt project, this will help you get started developing your models.
+
+**By the end of this Project, you will be able to:**
+* Understand requirements.
+* Transform a 3NF dataset into a Snowflake Schema.
+* Build in dbt using best practices.
+* Utilize packages, exposures, contracts, and the semantic layer.
+* Create a dbt pipeline.
+
+> **Let's begin the Project work!**
+
+---
+
+## Meet the Customer: Classic Car Components
+
+At Classic Car Components, we understand that owning a vintage automobile is not just about transportation; it's about preserving a piece of history and reliving the golden era of motoring. Our passion for classic cars drives us to provide enthusiasts, restorers, and collectors with the highest quality parts and accessories needed to maintain and restore these timeless treasures.
+
+### Classic Car Component's Heritage
+
+Founded by a team of classic car aficionados, Classic Car Components has grown from a small workshop into a leading supplier of authentic and aftermarket parts for a wide range of classic makes and models. Our deep-rooted knowledge and appreciation for vintage vehicles set us apart in the industry, ensuring that every part we offer meets the highest standards of quality and authenticity.
+
+### Classic Car Component's Products
+
+We specialize in a comprehensive range of parts for classic cars, including:
+
+* **Engine Components:** Pistons, crankshafts, gaskets, and more.
+* **Body Parts:** Fenders, bumpers, mirrors, and trim pieces.
+* **Electrical Systems:** Wiring harnesses, alternators, and ignition systems.
+* **Interior Accessories:** Upholstery, dashboards, and steering wheels.
+* **Suspension and Brakes:** Shocks, springs, and brake components.
+
+Whether you’re restoring a vintage roadster or maintaining a classic muscle car, we have the parts you need to ensure your vehicle runs smoothly and looks its best.
+
+---
+
+## Classic Car Component's Business Requirements
+
+Our customer, Classic Car Components, primarily provides car parts for those who wish to rebuild their classic cars. While classic cars remain a popular hobby for many, it is rather expensive to run a business focused only on classic cars. Classic Car Components has reached out to phData to help them start to better understand their business. 
+
+The first use case will be focused on providing a utilitarian data model that can help the business report on their orders and transactions. However, the company would love to use the momentum of what is built to look into optimizing their warehouse usage by maintaining enough inventory on high-selling products.
+
+Below you will find the ERD of the custom-built, in-house order processing system used at Classic Car Components:
+
+erDiagram
+    OFFICES {
+        varchar(16777216) OFFICE_CODE PK
+        varchar(16777216) CITY
+        varchar(16777216) PHONE
+        varchar(16777216) ADDRESS_LINE1
+        varchar(16777216) ADDRESS_LINE2
+        varchar(16777216) STATE
+        varchar(16777216) COUNTRY
+        varchar(16777216) POSTAL_CODE
+        varchar(16777216) TERRITORY
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    EMPLOYEES {
+        number(38_0) EMPLOYEE_NUMBER PK
+        varchar(16777216) LAST_NAME
+        varchar(16777216) FIRST_NAME
+        varchar(16777216) EXTENSION
+        varchar(16777216) EMAIL
+        varchar(16777216) OFFICE_CODE FK
+        number(38_0) REPORTS_TO FK
+        varchar(16777216) JOB_TITLE
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    CUSTOMERS {
+        number(38_0) CUSTOMER_NUMBER PK
+        varchar(16777216) CUSTOMER_NAME
+        varchar(16777216) CUSTOMER_LAST_NAME
+        varchar(16777216) CUSTOMER_FIRST_NAME
+        varchar(16777216) PHONE
+        varchar(16777216) ADDRESS_LINE1
+        varchar(16777216) ADDRESS_LINE2
+        varchar(16777216) CITY
+        varchar(16777216) STATE
+        varchar(16777216) POSTAL_CODE
+        varchar(16777216) COUNTRY
+        number(38_0) SALES_REP_EMPLOYEE_NUMBER FK
+        float CREDIT_LIMIT
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    ORDERS {
+        number(38_0) ORDER_NUMBER PK
+        date ORDER_DATE
+        date REQUIRED_DATE
+        date SHIPPED_DATE
+        varchar(16777216) STATUS
+        varchar(16777216) COMMENTS
+        number(38_0) CUSTOMER_NUMBER FK
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    ORDER_DETAILS {
+        number(38_0) ORDER_NUMBER PK,FK
+        varchar(16777216) PRODUCT_CODE PK,FK
+        number(38_0) ORDER_LINE_NUMBER PK
+        number(38_0) QUANTITY_ORDERED
+        float PRICE_EACH
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    PRODUCTS {
+        varchar(16777216) PRODUCT_CODE PK
+        varchar(16777216) PRODUCT_NAME
+        varchar(16777216) PRODUCT_LINE FK
+        varchar(16777216) PRODUCT_SCALE
+        varchar(16777216) PRODUCT_VENDOR
+        varchar(16777216) PRODUCT_DESCRIPTION
+        number(38_0) QUANTITY_IN_STOCK
+        float BUY_PRICE
+        float MSRP
+        timestamp_ltz(9) _SYNC_DATE
+        varchar(16777216) TEXT_DESCRIPTION FK
+    }
+
+    PRODUCT_LINES {
+        varchar(16777216) PRODUCT_LINE PK
+        varchar(16777216) TEXT_DESCRIPTION PK
+        varchar(16777216) HTML_DESCRIPTION
+        binary(8388608) IMAGE
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    PAYMENTS {
+        number(38_0) CUSTOMER_NUMBER PK,FK
+        varchar(16777216) CHECK_NUMBER PK
+        date PAYMENT_DATE
+        float AMOUNT
+        timestamp_ltz(9) _SYNC_DATE
+    }
+
+    %% Relationships
+    OFFICES ||--o{ EMPLOYEES : "has"
+    EMPLOYEES ||--o{ EMPLOYEES : "reports to"
+    EMPLOYEES ||--o{ CUSTOMERS : "represents"
+    CUSTOMERS ||--o{ ORDERS : "places"
+    CUSTOMERS ||--o{ PAYMENTS : "makes"
+    ORDERS ||--|{ ORDER_DETAILS : "contains"
+    PRODUCTS ||--o{ ORDER_DETAILS : "listed in"
+    PRODUCT_LINES ||--o{ PRODUCTS : "categorizes"
+
+To accomplish this, the team has decided to utilize dbt on top of Snowflake to create the starting place for a data model that will support reporting on a variety of needs across this data set. After some time meeting with the business and engineers, the Solution Architect returns with the following Snowflake data model:
+
+erDiagram
+    FCT_PAYMENTS {
+        binary(16) CUSTOMER_PK PK,FK
+        varchar(16777216) CHECK_NUMBER PK
+        date PAYMENT_DATE
+        float AMOUNT
+    }
+
+    DIM_CUSTOMERS {
+        binary(16) CUSTOMER_PK PK
+        varchar(16777216) CUSTOMER_NAME
+        varchar(16777216) CUSTOMER_LAST_NAME
+        varchar(16777216) CUSTOMER_FIRST_NAME
+        number(38_0) SALES_REP_EMPLOYEE_NUMBER
+        float CREDIT_LIMIT
+        varchar(16777216) PHONE
+        varchar(16777216) ADDRESS_LINE1
+        varchar(16777216) ADDRESS_LINE2
+        varchar(16777216) CITY
+        varchar(16777216) STATE
+        varchar(16777216) POSTAL_CODE
+        varchar(16777216) COUNTRY
+    }
+
+    DIM_ORDERS {
+        binary(16) ORDER_PK PK
+        date REQUIRED_DATE
+        date SHIPPED_DATE
+        varchar(16777216) STATUS
+        varchar(16777216) COMMENTS
+    }
+
+    FCT_ORDERS {
+        binary(16) ORDER_PK PK,FK
+        binary(16) PRODUCT_PK PK,FK
+        binary(16) CUSTOMER_PK PK,FK
+        number(38_0) ORDER_LINE_NUMBER PK
+        varchar(16777216) PRODUCT_CODE
+        number(38_0) QUANTITY_ORDERED
+        float PRICE_EACH
+    }
+
+    DIM_DATE {
+        date DATE_DAY PK
+        number(4_0) DATE_YEAR
+        number(2_0) DATE_QUARTER
+        number(2_0) DATE_MONTH
+        number(2_0) DATE_WEEK
+        number(2_0) DATE_DAY_OF_MONTH
+    }
+
+    DIM_PRODUCTS {
+        binary(16) PRODUCT_PK PK
+        varchar(16777216) PRODUCT_NAME
+        varchar(16777216) PRODUCT_LINE
+        varchar(16777216) PRODUCT_SCALE
+        varchar(16777216) PRODUCT_VENDOR
+        varchar(16777216) PRODUCT_DESCRIPTION
+    }
+
+    FCT_PRODUCTS {
+        binary(16) PRODUCT_PK PK,FK
+        number(38_0) QUANTITY_IN_STOCK
+        float BUY_PRICE
+        float MSRP
+    }
+
+    %% Relationships based on visual connections
+    DIM_CUSTOMERS ||--o{ FCT_PAYMENTS : "has payments"
+    DIM_CUSTOMERS ||--o{ FCT_ORDERS : "places"
+    DIM_ORDERS ||--o{ FCT_ORDERS : "contains"
+    DIM_PRODUCTS ||--o{ FCT_ORDERS : "included in"
+    DIM_PRODUCTS ||--|| FCT_PRODUCTS : "has inventory facts"
+
+To support the various transformations needed to support this data model, the Architect wants to build out a standard stage/intermediate/model architecture which looks like:
+
+├── models
+│   ├── intermediate
+│   │   ├── int_order_details.sql
+│   │   ├── int_order_details.yml
+│   │   ├── int_orders.sql
+│   │   └── int_orders.yml
+│   ├── marts
+│   │   ├── dim_orders.sql
+│   │   ├── dim_orders.yml
+│   │   ├── fct_orders.sql
+│   │   └── fct_orders.yml
+│   └── staging
+│       └── classic_models
+│           ├── _classic_models__sources.yml
+│           ├── stg_classic_models__orders.sql
+│           ├── stg_classic_models__orders.yml
+│           ├── stg_classic_models__order_details.sql
+│           ├── stg_classic_models__order_details.yml
+│           ├── stg_classic_models__customers.sql
+│           └── stg_classic_models__customers.yml
