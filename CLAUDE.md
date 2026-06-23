@@ -161,7 +161,7 @@ With the base repository forked, and your dbt project set up, it is time to buil
   > **DONE WHEN:** `dbt deps` succeeds and `dbt build --select staging` still passes.
   > **NOTE:** Added `dbt-labs/dbt_utils@1.4.0` to `packages.yml` as part of Activity 4 — needed for `generate_surrogate_key` in mart models.
 
-- [ ] **6. Build a date spine in our stage, and use it to create our date dimension**
+- [x] **6. Build a date spine in our stage, and use it to create our date dimension**
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files.
   > **DONE WHEN:** `dbt build --select stg_classic_models__date_spine dim_date` passes, and `preview_dbt_model('dim_date')` returns rows.
 
