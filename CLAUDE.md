@@ -197,7 +197,7 @@ With the base repository forked, and your dbt project set up, it is time to buil
   > **NOTE:** Set all other models to private.
   > **DONE WHEN:** `dbt build` still passes with contracts enforced.
 
-- [ ] **11. Run `dbt build` and address any errors raised by the project evaluator**
+- [x] **11. Run `dbt build` and address any errors raised by the project evaluator**
   > **DONE WHEN:** `dbt build` exits with zero errors, including all `dbt_project_evaluator` tests.
 
 - [ ] **12. Build a dbt job to execute your pipeline**
