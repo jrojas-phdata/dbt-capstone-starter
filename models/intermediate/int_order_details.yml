@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: int_order_details
+    description: >
+      Enriched order line items joining order details with order header attributes and
+      product descriptors. Each row represents one product line within an order.
+      Feeds fct_orders in the mart layer.
+    columns:
+      - name: order_id
+        description: Foreign key to the parent order.
+        data_tests:
+          - not_null
+      - name: product_code
+        description: Foreign key to the product included in the order line.
+        data_tests:
+          - not_null
+      - name: order_line_number
+        description: Sequence number of this line within its order.
+        data_tests:
+          - not_null
+      - name: quantity_ordered
+        description: Number of units ordered for this product line.
+      - name: price_each
+        description: Unit sale price agreed for this line item.
+      - name: order_date
+        description: Date the order was placed by the customer.
+      - name: required_date
+        description: Date by which the customer requires delivery.
+      - name: shipped_date
+        description: Date the order was physically shipped; null if not yet shipped.
+      - name: order_status
+        description: Current fulfilment status of the parent order.
+      - name: customer_id
+        description: Foreign key to the customer who placed the order.
+      - name: product_name
+        description: Human-readable name of the ordered product.
+      - name: product_line
+        description: Product category / line (e.g. Classic Cars, Motorcycles).
+      - name: product_scale
+        description: Scale of the model (e.g. 1:10, 1:18).
+      - name: product_vendor
+        description: Manufacturer or vendor who supplies the product.

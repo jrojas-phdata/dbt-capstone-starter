@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: int_orders
+    description: >
+      Orders joined with their associated customer details. Each row represents one
+      order enriched with the full customer profile at the time of reporting.
+      Feeds dim_orders and fct_orders in the mart layer.
+    columns:
+      - name: order_id
+        description: Primary key — unique identifier for each order.
+        data_tests:
+          - not_null
+          - unique
+      - name: order_date
+        description: Date the order was placed by the customer.
+      - name: required_date
+        description: Date by which the customer requires delivery.
+      - name: shipped_date
+        description: Date the order was physically shipped; null if not yet shipped.
+      - name: order_status
+        description: Current fulfilment status of the order.
+      - name: comments
+        description: Free-text notes attached to the order by staff.
+      - name: customer_id
+        description: Foreign key to the customer who placed the order.
+      - name: customer_name
+        description: Full company or account name of the customer.
+      - name: last_name
+        description: Last name of the primary contact at the customer account.
+      - name: first_name
+        description: First name of the primary contact at the customer account.
+      - name: phone
+        description: Primary phone number for the customer.
+      - name: address_line_1
+        description: First line of the customer's mailing address.
+      - name: address_line_2
+        description: Second line of the customer's mailing address; may be null.
+      - name: city
+        description: City component of the customer's address.
+      - name: state
+        description: State or province component of the customer's address; may be null.
+      - name: postal_code
+        description: Postal or ZIP code of the customer's address.
+      - name: country
+        description: Country component of the customer's address.
+      - name: sales_rep_employee_id
+        description: Foreign key to the employee assigned as this customer's sales rep.
+      - name: credit_limit
+        description: Maximum credit amount extended to the customer.
