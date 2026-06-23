@@ -92,6 +92,14 @@ A local MCP server (`mcp/server.py`) is registered as `snowflake` in `.mcp.json`
 - Default to views for staging, tables for intermediate and marts, unless told otherwise
 - Use the `snowflake` MCP tools to inspect live data rather than making assumptions about schema contents
 
+## Activity completion checklist
+
+After writing any model or config file, always complete these steps before marking an activity done:
+
+1. **Build** — run `dbt build --select <model(s)>` (or the layer, e.g. `--select staging`). Fix any compilation or test errors before continuing.
+2. **Verify in Snowflake** — for every model that materializes as a table or view, call `preview_dbt_model(model_name)` via the MCP server to confirm the object exists in Snowflake and rows are populated. For staging views, spot-check at least one model per activity.
+3. **Only mark the activity done** once both steps pass without errors.
+
 ## Activities
 
 With the base repository forked, and your dbt project set up, it is time to build out the data model that the Solution Architect has provided. Complete the following activities:
@@ -106,30 +114,40 @@ With the base repository forked, and your dbt project set up, it is time to buil
 - [ ] **2. Create a staging model for every table in our source following the naming convention above**
   > **REMEMBER:** Staging models should just clean column names and data types.
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
+  > **DONE WHEN:** `dbt build --select staging` passes all tests, and `preview_dbt_model` returns rows for every staging model.
 
 - [ ] **3. Build out the various intermediate data sets following our naming conventions**
   > **REMEMBER:** This is where we join data and perform the heavier transformations.
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
+  > **DONE WHEN:** `dbt build --select intermediate` passes all tests, and `preview_dbt_model` returns rows for every intermediate model.
 
 - [ ] **4. Build out the various data mart data sets following our naming conventions**
   > **REMEMBER:** This is where we efficiently materialize our data sets.
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
+  > **DONE WHEN:** `dbt build --select marts` passes all tests, and `preview_dbt_model` returns rows for every mart model.
 
 - [ ] **5. Bring in the `dbt_utils` package to our project so we can create our date dimension easily**
+  > **DONE WHEN:** `dbt deps` succeeds and `dbt build --select staging` still passes.
 
 - [ ] **6. Build a date spine in our stage, and use it to create our date dimension**
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files.
+  > **DONE WHEN:** `dbt build --select stg_classic_models__date_spine dim_date` passes, and `preview_dbt_model('dim_date')` returns rows.
 
 - [ ] **7. Apply appropriate tests to all created models**
   > **NOTE:** All models should have at least PK/FK tests.
+  > **DONE WHEN:** `dbt build` passes with zero test failures across all layers.
 
 - [ ] **8. Create an exposure of your final data model**
+  > **DONE WHEN:** `dbt build` still passes and `dbt ls --resource-type exposure` lists the exposure.
 
 - [ ] **9. Define at least 5 semantic layer metrics for the data model**
+  > **DONE WHEN:** `dbt build` still passes and `dbt ls --resource-type metric` lists at least 5 metrics.
 
 - [ ] **10. Provide a Data Contract on the final Data Model**
   > **NOTE:** Set all other models to private.
+  > **DONE WHEN:** `dbt build` still passes with contracts enforced.
 
 - [ ] **11. Run `dbt build` and address any errors raised by the project evaluator**
+  > **DONE WHEN:** `dbt build` exits with zero errors, including all `dbt_project_evaluator` tests.
 
 - [ ] **12. Build a dbt job to execute your pipeline**

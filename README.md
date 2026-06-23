@@ -1,18 +1,148 @@
 Welcome to our Dimensional Modeling Best Practices Project!
 
-### Pre-Reqs for this project
+---
 
-This project makes use of a open data set found [here](https://relational.fel.cvut.cz/dataset/ClassicModels). This data set will need to be configured as the source for this project to run. You will also want to configure your Database and Schemas that you want this to run into in the dbt_project.yml file.
+## Setup
 
-Once configuration has been complete you can run the project using:
-- dbt build
+### Prerequisites
 
+Make sure the following tools are installed before continuing:
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+| Tool | Purpose | Install |
+|------|---------|---------|
+| dbt Cloud CLI | Local dbt development connected to dbt Cloud | [Install guide](https://docs.getdbt.com/docs/cloud/cloud-cli-installation) |
+| Python ≥ 3.10 | Required by the Snowflake MCP server | [python.org](https://www.python.org/downloads/) |
+| uv | Runs the Snowflake MCP server | `pip install uv` or `brew install uv` |
+| pipx | Installs pre-commit in an isolated env | `pip install pipx` |
+| pre-commit | Git hook runner for linting and checks | `pipx install pre-commit` |
+
+> **dbt Cloud CLI vs dbt Core:** This project runs on **dbt Cloud** (project ID `554834`). Use the dbt Cloud CLI — not dbt Core — for local development. The Cloud CLI routes executions through dbt Cloud and automatically uses your cloud environment's connection.
+
+---
+
+### 1. Clone the repository
+
+```bash
+git clone <repo-url>
+cd dbt-capstone-starter
+```
+
+---
+
+### 2. Authenticate the dbt Cloud CLI
+
+The dbt Cloud CLI reads connection credentials from `~/.dbt/profiles.yml`. Create or update it with your Snowflake connection:
+
+```yaml
+default:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: <your-account-locator>       # e.g. PHDATAPARTNER-AWS
+      user: <your-snowflake-username>
+      role: <your-role>                     # e.g. USR_SEROJAS
+      warehouse: <your-warehouse>           # e.g. ALL_DE
+      database: sandbox
+      schema: <your-schema>                 # e.g. JSROJAS (used as dev prefix)
+      threads: 6
+      authenticator: externalbrowser        # SSO via browser; or use snowflake + password
+```
+
+> The source data lives in `SANDBOX.CLASSIC_MODELS`. The `schema` value becomes the prefix for your dev schemas (e.g. `JSROJAS_STAGE`, `JSROJAS_INTERMEDIATE`, `JSROJAS_DATA_MART`).
+
+---
+
+### 3. Install dbt packages
+
+```bash
+dbt deps
+```
+
+This installs `dbt_project_evaluator` (declared in `packages.yml`) into `dbt_packages/`.
+
+---
+
+### 4. Verify your connection
+
+```bash
+dbt debug
+```
+
+All checks should pass before proceeding.
+
+---
+
+### 5. Set up pre-commit hooks
+
+Pre-commit enforces SQL linting (sqlfluff), YAML formatting, and dbt model checks on every commit.
+
+```bash
+pre-commit install              # wire hooks into .git/hooks/pre-commit
+pre-commit install --install-hooks   # pre-download all hook environments
+```
+
+To run all hooks manually against the full codebase:
+
+```bash
+pre-commit run --all-files
+```
+
+Hooks configured in `.pre-commit-config.yaml`:
+
+| Hook | Purpose |
+|------|---------|
+| `trailing-whitespace`, `end-of-file-fixer`, `mixed-line-ending` | File hygiene |
+| `check-yaml` | YAML syntax validation |
+| `check-merge-conflict`, `check-added-large-files` | Safety checks |
+| `sqlfluff-lint` / `sqlfluff-fix` | SQL style enforcement (Snowflake dialect) |
+| `yamllint` | YAML formatting (max line length 120) |
+| `dbt-parse` | Validates dbt project parses cleanly |
+| `check-model-has-properties-file` | Every model must have a `.yml` companion |
+| `check-model-has-description` | Every model must have a description |
+| `check-model-name-contract` | Model names must start with `stg_`, `int_`, `dim_`, or `fct_` |
+| `check-source-has-loader` | Every source must declare a `loader:` |
+| `check-source-columns-have-desc` | Every source column must have a description |
+
+---
+
+### 6. Set up the Snowflake MCP server (Claude Code only)
+
+The MCP server (`mcp/server.py`) lets Claude Code query Snowflake directly. It is registered in `.mcp.json` and runs via `uv`.
+
+**Requirements:** `uv` must be installed (step 1) and `~/.dbt/profiles.yml` must be configured (step 2) — the server reads credentials from there at startup.
+
+**Activation:** The server starts automatically when Claude Code loads the project. Reload the VS Code window after updating credentials:
+
+- **VS Code:** `Cmd+Shift+P` → `Developer: Reload Window`
+- **Terminal:** restart the `claude` process
+
+**Verify connectivity** by asking Claude to run:
+
+```
+list_tables(schema=CLASSIC_MODELS)
+```
+
+You should see the 8 source tables returned.
+
+---
+
+### 7. Run the project
+
+```bash
+dbt build          # run + test all models
+dbt docs generate && dbt docs serve   # browse the data catalog
+```
+
+---
+
+### Resources
+
+- [dbt docs](https://docs.getdbt.com/docs/introduction)
+- [dbt Discourse](https://discourse.getdbt.com/)
+- [dbt Community Slack](https://community.getdbt.com/)
+- [dbt Blog](https://blog.getdbt.com/)
+- [Classic Models dataset](https://relational.fel.cvut.cz/dataset/ClassicModels)
 
 # Project Overview
 
@@ -53,7 +183,7 @@ Whether you're restoring a vintage roadster or maintaining a classic muscle car,
 
 ## Classic Car Component's Business Requirements
 
-Our customer, Classic Car Components, primarily provides car parts for those who wish to rebuild their classic cars. While classic cars remain a popular hobby for many, it is rather expensive to run a business focused only on classic cars. Classic Car Components has reached out to phData to help them start to better understand their business. 
+Our customer, Classic Car Components, primarily provides car parts for those who wish to rebuild their classic cars. While classic cars remain a popular hobby for many, it is rather expensive to run a business focused only on classic cars. Classic Car Components has reached out to phData to help them start to better understand their business.
 
 The first use case will be focused on providing a utilitarian data model that can help the business report on their orders and transactions. However, the company would love to use the momentum of what is built to look into optimizing their warehouse usage by maintaining enough inventory on high-selling products.
 

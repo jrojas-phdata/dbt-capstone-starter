@@ -5,6 +5,7 @@ sources:
     database: sandbox
     schema: classic_models
     description: Classic Models transactional source data in Snowflake.
+    loader: Snowflake (manual load)
 
     tables:
       - name: customers
