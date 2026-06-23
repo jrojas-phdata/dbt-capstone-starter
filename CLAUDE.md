@@ -188,8 +188,10 @@ With the base repository forked, and your dbt project set up, it is time to buil
   > **DONE WHEN:** `dbt build` still passes and `dbt ls --resource-type exposure` lists the exposure.
   > **NOTE (Fusion):** `--resource-type exposure` is not supported. Verify with `dbt ls --select exposure:<name>` instead.
 
-- [ ] **9. Define at least 5 semantic layer metrics for the data model**
+- [x] **9. Define at least 5 semantic layer metrics for the data model**
   > **DONE WHEN:** `dbt build` still passes and `dbt ls --resource-type metric` lists at least 5 metrics.
+  > **NOTE (Fusion):** Use the new embedded semantic layer format — `semantic_model:`, `metrics:`, `entity:`, and `dimension:` are written inside the model's existing `.yml` file (not in a separate `semantic_models:` block). The legacy MetricFlow top-level `semantic_models:` / `metrics:` block parses but is not registered by `dbt ls`. Semantic models with time dimensions require a primary entity; omit time dimensions from fact tables that have composite PKs or add a surrogate PK column.
+  > **NOTE (IDE):** The VS Code dbt schema validator flags `semantic_model`, `metrics`, `entity`, and `dimension` as "not allowed" — this is a stale schema, not a real error. Fusion accepts the format.
 
 - [ ] **10. Provide a Data Contract on the final Data Model**
   > **NOTE:** Set all other models to private.

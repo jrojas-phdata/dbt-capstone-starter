@@ -6,15 +6,34 @@ models:
       Payment fact table at the grain of one row per customer payment (check number).
       Surrogate customer key aligns with dim_customers. Sourced from
       stg_classic_models__payments.
+    semantic_model:
+      enabled: true
+      name: payments
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
               - customer_pk
               - check_number
+    metrics:
+      - name: total_payments_received
+        label: Total Payments Received
+        description: Sum of all payment amounts received from customers.
+        type: simple
+        agg: sum
+        expr: amount
+      - name: payment_count
+        label: Payment Count
+        description: Count of distinct payments received by check number.
+        type: simple
+        agg: count_distinct
+        expr: check_number
     columns:
       - name: customer_pk
         description: Surrogate key referencing dim_customers; derived from customer_id.
+        entity:
+          type: foreign
+          name: customer
         data_tests:
           - not_null
           - relationships:
