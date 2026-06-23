@@ -6,6 +6,13 @@ models:
       Enriched order line items joining order details with order header attributes and
       product descriptors. Each row represents one product line within an order.
       Feeds fct_orders in the mart layer.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - product_code
+              - order_line_number
     columns:
       - name: order_id
         description: Foreign key to the parent order.

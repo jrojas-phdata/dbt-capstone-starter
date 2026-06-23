@@ -93,15 +93,30 @@ models:
 ```
 If the key is wrong (e.g. `data_vault`), the layer configs are silently ignored and all models land in the default schema (`JROJAS`) instead of `JROJAS_STAGE` / `JROJAS_INTERMEDIATE` / `JROJAS_DATA_MART`.
 
-**`accepted_values` test syntax changed in dbt Fusion.**
-The `values` list must be nested under `arguments:`:
+**All generic test arguments must be nested under `arguments:` in dbt Fusion.**
+This applies to every generic test — `accepted_values`, `relationships`, `dbt_utils.unique_combination_of_columns`, and others. Using bare arguments raises `DbtYamlValidationError` at parse time.
 ```yaml
+# accepted_values
 data_tests:
   - accepted_values:
       arguments:
-        values: ['active', 'inactive']
+        values: ['Shipped', 'Cancelled']
+
+# relationships (FK)
+data_tests:
+  - relationships:
+      arguments:
+        to: ref('dim_customers')
+        field: customer_pk
+
+# dbt_utils composite uniqueness (model-level)
+data_tests:
+  - dbt_utils.unique_combination_of_columns:
+      arguments:
+        combination_of_columns:
+          - order_id
+          - product_code
 ```
-Using the old format (`values:` at the top level) raises a `DbtYamlValidationError` at parse time.
 
 **`dbt docs generate` is not supported in dbt Fusion — use `dbt compile --write-catalog` instead.**
 This also means `target/catalog.json` must be generated before committing, because the `check-model-name-contract` pre-commit hook requires it. Run this once before a commit session:
@@ -165,7 +180,7 @@ With the base repository forked, and your dbt project set up, it is time to buil
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files.
   > **DONE WHEN:** `dbt build --select stg_classic_models__date_spine dim_date` passes, and `preview_dbt_model('dim_date')` returns rows.
 
-- [ ] **7. Apply appropriate tests to all created models**
+- [x] **7. Apply appropriate tests to all created models**
   > **NOTE:** All models should have at least PK/FK tests.
   > **DONE WHEN:** `dbt build` passes with zero test failures across all layers.
 

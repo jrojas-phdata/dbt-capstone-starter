@@ -6,11 +6,21 @@ models:
       Payment fact table at the grain of one row per customer payment (check number).
       Surrogate customer key aligns with dim_customers. Sourced from
       stg_classic_models__payments.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - customer_pk
+              - check_number
     columns:
       - name: customer_pk
         description: Surrogate key referencing dim_customers; derived from customer_id.
         data_tests:
           - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_pk
       - name: check_number
         description: Check number uniquely identifying the payment within a customer.
         data_tests:
