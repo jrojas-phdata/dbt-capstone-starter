@@ -124,6 +124,15 @@ This also means `target/catalog.json` must be generated before committing, becau
 dbt compile --write-catalog --quiet
 ```
 
+**`dbt_project_evaluator` fails in dbt Cloud with `invalid identifier 'UNIONED_WITH_CALC.MODEL'`.**
+`dbt_project_evaluator` v1.3.1 references a `model` column in `int_all_graph_resources` that only exists when metrics are defined in the legacy MetricFlow YAML format. Our metrics use the new Fusion-embedded format, so the column is absent and the evaluator crashes at runtime in dbt Cloud.
+
+**Fix:** Exclude the evaluator package from dbt Cloud job commands — it is a dev/CI quality gate, not a production runtime dependency:
+```bash
+dbt build --exclude package:dbt_project_evaluator
+```
+The evaluator still runs correctly locally via `dbt build` with dbt Fusion and in PR CI checks.
+
 **A project-level `profiles.yml` overrides `~/.dbt/profiles.yml`.**
 The repo ships a gitignored template `profiles.yml` with placeholder values. If it exists in the project root, dbt reads it first and fails to connect. Delete it (it is gitignored) so dbt falls back to `~/.dbt/profiles.yml`.
 
