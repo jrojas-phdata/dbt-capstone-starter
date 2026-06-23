@@ -6,6 +6,9 @@ models:
       Order line-item fact table at the grain of one row per order-product combination.
       Surrogate keys align with dim_orders, dim_products, and dim_customers for
       efficient star-schema joins. Sourced from int_order_details.
+    config:
+      contract:
+        enforced: true
     semantic_model:
       enabled: true
       name: orders
@@ -38,6 +41,9 @@ models:
     columns:
       - name: order_pk
         description: Surrogate key referencing dim_orders; derived from order_id.
+        data_type: varchar
+        constraints:
+          - type: not_null
         entity:
           type: foreign
           name: order
@@ -49,6 +55,9 @@ models:
                 field: order_pk
       - name: product_pk
         description: Surrogate key referencing dim_products; derived from product_code.
+        data_type: varchar
+        constraints:
+          - type: not_null
         entity:
           type: foreign
           name: product
@@ -60,6 +69,9 @@ models:
                 field: product_pk
       - name: customer_pk
         description: Surrogate key referencing dim_customers; derived from customer_id.
+        data_type: varchar
+        constraints:
+          - type: not_null
         entity:
           type: foreign
           name: customer
@@ -71,11 +83,17 @@ models:
                 field: customer_pk
       - name: order_line_number
         description: Sequence number of this line within its parent order.
+        data_type: number(38,0)
+        constraints:
+          - type: not_null
         data_tests:
           - not_null
       - name: product_code
         description: Natural key of the ordered product.
+        data_type: varchar
       - name: quantity_ordered
         description: Number of units ordered for this product line.
+        data_type: number(38,0)
       - name: price_each
         description: Unit sale price agreed for this line item.
+        data_type: number(18,2)

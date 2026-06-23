@@ -6,33 +6,51 @@ models:
       Customer dimension containing one row per customer. Surrogate key generated
       from the source customer_id. Used to resolve customer attributes across
       fct_orders and fct_payments.
+    config:
+      contract:
+        enforced: true
     columns:
       - name: customer_pk
         description: Surrogate primary key derived from customer_id.
+        data_type: varchar
+        constraints:
+          - type: not_null
         data_tests:
           - not_null
           - unique
       - name: customer_name
         description: Full company or account name of the customer.
+        data_type: varchar
       - name: last_name
         description: Last name of the primary contact at the customer account.
+        data_type: varchar
       - name: first_name
         description: First name of the primary contact at the customer account.
+        data_type: varchar
       - name: sales_rep_employee_id
         description: Foreign key to the employee assigned as this customer's sales rep.
+        data_type: number(38,0)
       - name: credit_limit
         description: Maximum credit amount extended to the customer.
+        data_type: number(18,2)
       - name: phone
         description: Primary phone number for the customer.
+        data_type: varchar
       - name: address_line_1
         description: First line of the customer's mailing address.
+        data_type: varchar
       - name: address_line_2
         description: Second line of the customer's mailing address; may be null.
+        data_type: varchar
       - name: city
         description: City component of the customer's address.
+        data_type: varchar
       - name: state
         description: State or province component of the customer's address; may be null.
+        data_type: varchar
       - name: postal_code
         description: Postal or ZIP code of the customer's address.
+        data_type: varchar
       - name: country
         description: Country component of the customer's address.
+        data_type: varchar

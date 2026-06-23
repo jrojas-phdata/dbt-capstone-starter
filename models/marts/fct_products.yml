@@ -6,10 +6,12 @@ models:
       Product inventory fact table at the grain of one row per product. Surrogate key
       aligns with dim_products for star-schema joins. Contains measurable inventory
       and pricing facts sourced from stg_classic_models__products.
+    config:
+      contract:
+        enforced: true
     semantic_model:
       enabled: true
       name: product_inventory
-    data_tests: []
     metrics:
       - name: total_inventory_value
         label: Total Inventory Value
@@ -20,6 +22,9 @@ models:
     columns:
       - name: product_pk
         description: Surrogate primary key derived from product_code; references dim_products.
+        data_type: varchar
+        constraints:
+          - type: not_null
         entity:
           type: primary
           name: product
@@ -28,7 +33,10 @@ models:
           - unique
       - name: quantity_in_stock
         description: Number of units currently held in inventory.
+        data_type: number(38,0)
       - name: buy_price
         description: Wholesale cost per unit paid to the vendor.
+        data_type: number(18,2)
       - name: msrp
         description: Manufacturer's suggested retail price per unit.
+        data_type: number(18,2)

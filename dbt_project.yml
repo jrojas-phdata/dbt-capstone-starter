@@ -38,14 +38,17 @@ models:
       +materialized: view
       +database: "sandbox"
       +schema: "stage"
+      +access: private
     intermediate:
       +materialized: table
       +database: "sandbox"
       +schema: "intermediate"
+      +access: private
     marts:
       +materialized: table
       +database: "sandbox"
       +schema: "data_mart"
+      +access: public
   dbt_project_evaluator:
     +database: "sandbox"
     +schema: "dbt_project_evaluator"
