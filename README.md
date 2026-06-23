@@ -252,17 +252,37 @@ To support the various transformations needed to support this data model, the Ar
 │   │   ├── int_orders.sql
 │   │   └── int_orders.yml
 │   ├── marts
+│   │   ├── dim_customers.sql
+│   │   ├── dim_customers.yml
+│   │   ├── dim_date.sql
+│   │   ├── dim_date.yml
 │   │   ├── dim_orders.sql
 │   │   ├── dim_orders.yml
+│   │   ├── dim_products.sql
+│   │   ├── dim_products.yml
 │   │   ├── fct_orders.sql
-│   │   └── fct_orders.yml
+│   │   ├── fct_orders.yml
+│   │   ├── fct_payments.sql
+│   │   ├── fct_payments.yml
+│   │   ├── fct_products.sql
+│   │   └── fct_products.yml
 │   └── staging
 │       └── classic_models
 │           ├── _classic_models__sources.yml
-│           ├── stg_classic_models__orders.sql
-│           ├── stg_classic_models__orders.yml
+│           ├── stg_classic_models__customers.sql
+│           ├── stg_classic_models__customers.yml
+│           ├── stg_classic_models__employees.sql
+│           ├── stg_classic_models__employees.yml
+│           ├── stg_classic_models__offices.sql
+│           ├── stg_classic_models__offices.yml
 │           ├── stg_classic_models__order_details.sql
 │           ├── stg_classic_models__order_details.yml
-│           ├── stg_classic_models__customers.sql
-│           └── stg_classic_models__customers.yml
+│           ├── stg_classic_models__orders.sql
+│           ├── stg_classic_models__orders.yml
+│           ├── stg_classic_models__payments.sql
+│           ├── stg_classic_models__payments.yml
+│           ├── stg_classic_models__product_lines.sql
+│           ├── stg_classic_models__product_lines.yml
+│           ├── stg_classic_models__products.sql
+│           └── stg_classic_models__products.yml
 ```

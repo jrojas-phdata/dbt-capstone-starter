@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "snowflake": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/Users/jsrojass/Documents/GitHub/dbt-capstone-starter/mcp",
+        "python",
+        "server.py"
+      ],
+      "env": {}
+    }
+  }
+}

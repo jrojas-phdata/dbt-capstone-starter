@@ -1,0 +1,259 @@
+version: 2
+
+sources:
+  - name: classic_models
+    database: sandbox
+    schema: classic_models
+    description: Classic Models transactional source data in Snowflake.
+
+    tables:
+      - name: customers
+        description: One row per customer in the Classic Models system.
+        columns:
+          - name: customer_number
+            description: Source system primary key for the customer.
+            data_tests:
+              - not_null
+              - unique
+
+          - name: customer_name
+            description: Company or individual name of the customer.
+
+          - name: customer_last_name
+            description: Last name of the primary contact.
+
+          - name: customer_first_name
+            description: First name of the primary contact.
+
+          - name: phone
+            description: Customer phone number.
+
+          - name: address_line1
+            description: Primary street address line.
+
+          - name: address_line2
+            description: Secondary street address line.
+
+          - name: city
+            description: City of the customer address.
+
+          - name: state
+            description: State or province of the customer address.
+
+          - name: postal_code
+            description: Postal or ZIP code of the customer address.
+
+          - name: country
+            description: Country of the customer address.
+
+          - name: sales_rep_employee_number
+            description: Foreign key to the employee assigned as the sales representative.
+
+          - name: credit_limit
+            description: Maximum credit extended to the customer in USD.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: employees
+        description: One row per employee in the Classic Models system.
+        columns:
+          - name: employee_number
+            description: Source system primary key for the employee.
+            data_tests:
+              - not_null
+              - unique
+
+          - name: last_name
+            description: Employee last name.
+
+          - name: first_name
+            description: Employee first name.
+
+          - name: extension
+            description: Internal phone extension.
+
+          - name: email
+            description: Employee email address.
+
+          - name: office_code
+            description: Foreign key to the office where the employee works.
+
+          - name: reports_to
+            description: Foreign key to the employee this person reports to (self-referential).
+
+          - name: job_title
+            description: Job title of the employee.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: offices
+        description: One row per office location in the Classic Models system.
+        columns:
+          - name: office_code
+            description: Source system primary key for the office.
+            data_tests:
+              - not_null
+              - unique
+
+          - name: city
+            description: City where the office is located.
+
+          - name: phone
+            description: Office phone number.
+
+          - name: address_line1
+            description: Primary street address line.
+
+          - name: address_line2
+            description: Secondary street address line.
+
+          - name: state
+            description: State or province where the office is located.
+
+          - name: country
+            description: Country where the office is located.
+
+          - name: postal_code
+            description: Postal or ZIP code of the office address.
+
+          - name: territory
+            description: Sales territory associated with the office.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: orders
+        description: One row per customer order in the Classic Models system.
+        columns:
+          - name: order_number
+            description: Source system primary key for the order.
+            data_tests:
+              - not_null
+              - unique
+
+          - name: order_date
+            description: Date the order was placed.
+
+          - name: required_date
+            description: Date by which the customer requested delivery.
+
+          - name: shipped_date
+            description: Date the order was shipped. Null if not yet shipped.
+
+          - name: status
+            description: Current status of the order.
+
+          - name: comments
+            description: Free-text comments on the order.
+
+          - name: customer_number
+            description: Foreign key to the customer who placed the order.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: order_details
+        description: One row per product line item within an order. Composite PK is order_number + product_code.
+        columns:
+          - name: order_number
+            description: Foreign key to the parent order.
+            data_tests:
+              - not_null
+
+          - name: product_code
+            description: Foreign key to the product ordered.
+            data_tests:
+              - not_null
+
+          - name: quantity_ordered
+            description: Number of units ordered for this line item.
+
+          - name: price_each
+            description: Unit price at the time of the order in USD.
+
+          - name: order_line_number
+            description: Sequence number of this line item within the order.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: payments
+        description: One row per payment made by a customer. Composite PK is customer_number + check_number.
+        columns:
+          - name: customer_number
+            description: Foreign key to the customer who made the payment.
+            data_tests:
+              - not_null
+
+          - name: check_number
+            description: Check or payment reference number. Unique within a customer.
+            data_tests:
+              - not_null
+
+          - name: payment_date
+            description: Date the payment was received.
+
+          - name: amount
+            description: Payment amount in USD.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: products
+        description: One row per product in the Classic Models catalog.
+        columns:
+          - name: product_code
+            description: Source system primary key for the product.
+            data_tests:
+              - not_null
+              - unique
+
+          - name: product_name
+            description: Display name of the product.
+
+          - name: product_line
+            description: Foreign key to the product line category.
+
+          - name: product_scale
+            description: Scale of the model (e.g., 1:18, 1:24).
+
+          - name: product_vendor
+            description: Name of the vendor who supplies the product.
+
+          - name: product_description
+            description: Detailed text description of the product.
+
+          - name: quantity_in_stock
+            description: Current inventory count for the product.
+
+          - name: buy_price
+            description: Wholesale cost of the product in USD.
+
+          - name: msrp
+            description: Manufacturer suggested retail price in USD.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
+
+      - name: product_lines
+        description: One row per product line category in the Classic Models catalog.
+        columns:
+          - name: product_line
+            description: Source system primary key for the product line.
+            data_tests:
+              - not_null
+              - unique
+
+          - name: text_description
+            description: Plain text description of the product line.
+
+          - name: html_description
+            description: HTML-formatted description of the product line.
+
+          - name: image
+            description: Binary image associated with the product line.
+
+          - name: _sync_date
+            description: Timestamp when this record was last synced from the source system.
