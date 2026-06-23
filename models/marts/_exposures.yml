@@ -1,0 +1,22 @@
+version: 2
+
+exposures:
+  - name: classic_car_components_reporting
+    type: dashboard
+    maturity: medium
+    description: >
+      Business reporting dashboard for Classic Car Components covering order
+      transactions, customer analytics, product inventory, and payment tracking.
+      Consumes the full mart layer to support reporting on sales performance,
+      inventory health, and customer payment behaviour.
+    depends_on:
+      - ref('dim_customers')
+      - ref('dim_date')
+      - ref('dim_orders')
+      - ref('dim_products')
+      - ref('fct_orders')
+      - ref('fct_payments')
+      - ref('fct_products')
+    owner:
+      name: Classic Car Components Data Team
+      email: jrojas@phdata.io

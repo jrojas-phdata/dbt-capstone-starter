@@ -184,8 +184,9 @@ With the base repository forked, and your dbt project set up, it is time to buil
   > **NOTE:** All models should have at least PK/FK tests.
   > **DONE WHEN:** `dbt build` passes with zero test failures across all layers.
 
-- [ ] **8. Create an exposure of your final data model**
+- [x] **8. Create an exposure of your final data model**
   > **DONE WHEN:** `dbt build` still passes and `dbt ls --resource-type exposure` lists the exposure.
+  > **NOTE (Fusion):** `--resource-type exposure` is not supported. Verify with `dbt ls --select exposure:<name>` instead.
 
 - [ ] **9. Define at least 5 semantic layer metrics for the data model**
   > **DONE WHEN:** `dbt build` still passes and `dbt ls --resource-type metric` lists at least 5 metrics.
