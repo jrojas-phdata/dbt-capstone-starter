@@ -180,6 +180,19 @@ dbt will then fall back to `~/.dbt/profiles.yml` which contains your real creden
 
 ---
 
+### `check-model-name-contract` pre-commit hook fails with "Unable to load catalog file"
+
+**Symptom:** Pre-commit fails with `[Errno 2] No such file or directory: 'target/catalog.json'`.
+
+**Cause:** The `check-model-name-contract` hook from dbt-checkpoint requires `target/catalog.json` to exist. `dbt docs generate` is not supported in dbt Fusion.
+
+**Fix:** Generate the catalog before committing:
+```bash
+dbt compile --write-catalog --quiet
+```
+
+---
+
 ### `accepted_values` test raises `DbtYamlValidationError`
 
 **Symptom:** Parse error — *"Deprecated test arguments: values detected. Please migrate to the new format under the arguments field."*

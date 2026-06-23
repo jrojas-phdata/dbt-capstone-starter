@@ -103,6 +103,12 @@ data_tests:
 ```
 Using the old format (`values:` at the top level) raises a `DbtYamlValidationError` at parse time.
 
+**`dbt docs generate` is not supported in dbt Fusion — use `dbt compile --write-catalog` instead.**
+This also means `target/catalog.json` must be generated before committing, because the `check-model-name-contract` pre-commit hook requires it. Run this once before a commit session:
+```bash
+dbt compile --write-catalog --quiet
+```
+
 **A project-level `profiles.yml` overrides `~/.dbt/profiles.yml`.**
 The repo ships a gitignored template `profiles.yml` with placeholder values. If it exists in the project root, dbt reads it first and fails to connect. Delete it (it is gitignored) so dbt falls back to `~/.dbt/profiles.yml`.
 
