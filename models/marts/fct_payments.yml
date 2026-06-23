@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: fct_payments
+    description: >
+      Payment fact table at the grain of one row per customer payment (check number).
+      Surrogate customer key aligns with dim_customers. Sourced from
+      stg_classic_models__payments.
+    columns:
+      - name: customer_pk
+        description: Surrogate key referencing dim_customers; derived from customer_id.
+        data_tests:
+          - not_null
+      - name: check_number
+        description: Check number uniquely identifying the payment within a customer.
+        data_tests:
+          - not_null
+      - name: payment_date
+        description: Date the payment was received.
+      - name: amount
+        description: Total payment amount.

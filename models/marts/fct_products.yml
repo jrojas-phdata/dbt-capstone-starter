@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: fct_products
+    description: >
+      Product inventory fact table at the grain of one row per product. Surrogate key
+      aligns with dim_products for star-schema joins. Contains measurable inventory
+      and pricing facts sourced from stg_classic_models__products.
+    columns:
+      - name: product_pk
+        description: Surrogate primary key derived from product_code; references dim_products.
+        data_tests:
+          - not_null
+          - unique
+      - name: quantity_in_stock
+        description: Number of units currently held in inventory.
+      - name: buy_price
+        description: Wholesale cost per unit paid to the vendor.
+      - name: msrp
+        description: Manufacturer's suggested retail price per unit.

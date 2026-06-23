@@ -146,18 +146,20 @@ With the base repository forked, and your dbt project set up, it is time to buil
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
   > **DONE WHEN:** `dbt build --select staging` passes all tests, and `preview_dbt_model` returns rows for every staging model.
 
-- [ ] **3. Build out the various intermediate data sets following our naming conventions**
+- [x] **3. Build out the various intermediate data sets following our naming conventions**
   > **REMEMBER:** This is where we join data and perform the heavier transformations.
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
   > **DONE WHEN:** `dbt build --select intermediate` passes all tests, and `preview_dbt_model` returns rows for every intermediate model.
 
-- [ ] **4. Build out the various data mart data sets following our naming conventions**
+- [x] **4. Build out the various data mart data sets following our naming conventions**
   > **REMEMBER:** This is where we efficiently materialize our data sets.
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
   > **DONE WHEN:** `dbt build --select marts` passes all tests, and `preview_dbt_model` returns rows for every mart model.
+  > **NOTE:** `dim_date` is deferred to Activity 6 (requires date spine). Six mart models built: `dim_customers`, `dim_orders`, `dim_products`, `fct_orders`, `fct_payments`, `fct_products`.
 
-- [ ] **5. Bring in the `dbt_utils` package to our project so we can create our date dimension easily**
+- [x] **5. Bring in the `dbt_utils` package to our project so we can create our date dimension easily**
   > **DONE WHEN:** `dbt deps` succeeds and `dbt build --select staging` still passes.
+  > **NOTE:** Added `dbt-labs/dbt_utils@1.4.0` to `packages.yml` as part of Activity 4 — needed for `generate_surrogate_key` in mart models.
 
 - [ ] **6. Build a date spine in our stage, and use it to create our date dimension**
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files.

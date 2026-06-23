@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: >
+      Customer dimension containing one row per customer. Surrogate key generated
+      from the source customer_id. Used to resolve customer attributes across
+      fct_orders and fct_payments.
+    columns:
+      - name: customer_pk
+        description: Surrogate primary key derived from customer_id.
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_name
+        description: Full company or account name of the customer.
+      - name: last_name
+        description: Last name of the primary contact at the customer account.
+      - name: first_name
+        description: First name of the primary contact at the customer account.
+      - name: sales_rep_employee_id
+        description: Foreign key to the employee assigned as this customer's sales rep.
+      - name: credit_limit
+        description: Maximum credit amount extended to the customer.
+      - name: phone
+        description: Primary phone number for the customer.
+      - name: address_line_1
+        description: First line of the customer's mailing address.
+      - name: address_line_2
+        description: Second line of the customer's mailing address; may be null.
+      - name: city
+        description: City component of the customer's address.
+      - name: state
+        description: State or province component of the customer's address; may be null.
+      - name: postal_code
+        description: Postal or ZIP code of the customer's address.
+      - name: country
+        description: Country component of the customer's address.

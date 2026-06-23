@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: dim_orders
+    description: >
+      Order dimension containing descriptive attributes for each order. Surrogate key
+      generated from order_id. Joined to fct_orders on order_pk to provide
+      fulfilment context such as status, ship date, and required date.
+    columns:
+      - name: order_pk
+        description: Surrogate primary key derived from order_id.
+        data_tests:
+          - not_null
+          - unique
+      - name: required_date
+        description: Date by which the customer requires delivery.
+      - name: shipped_date
+        description: Date the order was physically shipped; null if not yet shipped.
+      - name: status
+        description: Current fulfilment status of the order.
+      - name: comments
+        description: Free-text notes attached to the order by staff; may be null.

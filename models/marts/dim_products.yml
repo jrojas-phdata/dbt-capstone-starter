@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: dim_products
+    description: >
+      Product dimension containing descriptive attributes for each product. Surrogate
+      key generated from product_code. Joined to fct_orders and fct_products on
+      product_pk to provide product context.
+    columns:
+      - name: product_pk
+        description: Surrogate primary key derived from product_code.
+        data_tests:
+          - not_null
+          - unique
+      - name: product_name
+        description: Human-readable name of the product.
+      - name: product_line
+        description: Product category / line (e.g. Classic Cars, Motorcycles).
+      - name: product_scale
+        description: Scale of the model (e.g. 1:10, 1:18).
+      - name: product_vendor
+        description: Manufacturer or vendor who supplies the product.
+      - name: product_description
+        description: Long-form description of the product.
