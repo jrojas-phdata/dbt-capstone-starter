@@ -2,7 +2,7 @@ Welcome to our Dimensional Modeling Best Practices Project!
 
 ### Pre-Reqs for this project
 
-This project makes use of a open data set found [here](https://relational.fit.cvut.cz/dataset/ClassicModels). This data set will need to be configured as the source for this project to run. You will also want to configure your Database and Schemas that you want this to run into in the dbt_project.yml file.
+This project makes use of a open data set found [here](https://relational.fel.cvut.cz/dataset/ClassicModels). This data set will need to be configured as the source for this project to run. You will also want to configure your Database and Schemas that you want this to run into in the dbt_project.yml file.
 
 Once configuration has been complete you can run the project using:
 - dbt build
