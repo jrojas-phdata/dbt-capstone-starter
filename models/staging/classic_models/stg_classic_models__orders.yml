@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_classic_models__orders
+    description: >
+      One row per customer order from the Classic Models source system.
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: order_id
+        description: Natural primary key for the order (source ORDER_NUMBER).
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_date
+        description: Date the order was placed.
+
+      - name: required_date
+        description: Date by which the customer requested delivery.
+
+      - name: shipped_date
+        description: Date the order was shipped. Null if not yet shipped.
+
+      - name: order_status
+        description: Current lifecycle status of the order.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - 'Shipped'
+                  - 'Resolved'
+                  - 'Cancelled'
+                  - 'On Hold'
+                  - 'Disputed'
+                  - 'In Process'
+
+      - name: comments
+        description: Free-text comments on the order.
+
+      - name: customer_id
+        description: Foreign key to the customer who placed the order.
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

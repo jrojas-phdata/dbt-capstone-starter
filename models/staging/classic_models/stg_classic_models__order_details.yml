@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_classic_models__order_details
+    description: >
+      One row per product line item within an order from the Classic Models source system.
+      Composite natural key is (order_id, product_code, order_line_number).
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: order_id
+        description: Foreign key to the parent order. Part of the composite natural key.
+        data_tests:
+          - not_null
+
+      - name: product_code
+        description: Foreign key to the product ordered. Part of the composite natural key.
+        data_tests:
+          - not_null
+
+      - name: order_line_number
+        description: Sequence number of this line item within the order. Part of the composite natural key.
+        data_tests:
+          - not_null
+
+      - name: quantity_ordered
+        description: Number of units ordered for this line item.
+
+      - name: price_each
+        description: Unit price at the time of the order in USD.
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

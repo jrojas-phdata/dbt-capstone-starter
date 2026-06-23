@@ -33,7 +33,7 @@ seeds:
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 models:
-  data_vault:
+  dim_model:
     staging:
       +materialized: view
       +database: "sandbox"

@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: stg_classic_models__payments
+    description: >
+      One row per payment made by a customer from the Classic Models source system.
+      Composite natural key is (customer_id, check_number).
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: customer_id
+        description: Foreign key to the customer who made the payment. Part of the composite natural key.
+        data_tests:
+          - not_null
+
+      - name: check_number
+        description: Check or payment reference number. Unique within a customer. Part of the composite natural key.
+        data_tests:
+          - not_null
+
+      - name: payment_date
+        description: Date the payment was received.
+
+      - name: amount
+        description: Payment amount in USD.
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: stg_classic_models__customers
+    description: >
+      One row per customer from the Classic Models source system.
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: customer_id
+        description: Natural primary key for the customer (source CUSTOMER_NUMBER).
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_name
+        description: Company or individual name of the customer.
+
+      - name: last_name
+        description: Last name of the primary contact at the customer.
+
+      - name: first_name
+        description: First name of the primary contact at the customer.
+
+      - name: phone
+        description: Customer phone number.
+
+      - name: address_line_1
+        description: Primary street address line.
+
+      - name: address_line_2
+        description: Secondary street address line.
+
+      - name: city
+        description: City of the customer address.
+
+      - name: state
+        description: State or province of the customer address.
+
+      - name: postal_code
+        description: Postal or ZIP code of the customer address.
+
+      - name: country
+        description: Country of the customer address.
+
+      - name: sales_rep_employee_id
+        description: Foreign key to the employee assigned as the sales representative.
+
+      - name: credit_limit
+        description: Maximum credit extended to the customer in USD.
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

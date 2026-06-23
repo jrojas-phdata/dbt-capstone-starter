@@ -144,6 +144,64 @@ dbt docs generate && dbt docs serve   # browse the data catalog
 - [dbt Blog](https://blog.getdbt.com/)
 - [Classic Models dataset](https://relational.fel.cvut.cz/dataset/ClassicModels)
 
+---
+
+## Troubleshooting
+
+### Models land in the wrong Snowflake schema
+
+**Symptom:** Views/tables appear in `JROJAS` instead of `JROJAS_STAGE` / `JROJAS_INTERMEDIATE` / `JROJAS_DATA_MART`.
+
+**Cause:** The `models:` key in `dbt_project.yml` must exactly match the project `name:` field (`dim_model`). If it says `data_vault` or anything else, the layer schema configs are silently ignored.
+
+**Fix:** Open `dbt_project.yml` and verify:
+```yaml
+name: 'dim_model'
+...
+models:
+  dim_model:      # ← must match name above
+    staging:
+      +schema: "stage"
+```
+
+---
+
+### dbt fails to connect with placeholder credentials
+
+**Symptom:** Connection error referencing `<your-account-identifier>` or similar placeholders.
+
+**Cause:** A project-level `profiles.yml` (gitignored template) exists in the repo root and overrides `~/.dbt/profiles.yml`.
+
+**Fix:** Delete the project-level file:
+```bash
+rm profiles.yml
+```
+dbt will then fall back to `~/.dbt/profiles.yml` which contains your real credentials.
+
+---
+
+### `accepted_values` test raises `DbtYamlValidationError`
+
+**Symptom:** Parse error — *"Deprecated test arguments: values detected. Please migrate to the new format under the arguments field."*
+
+**Cause:** dbt Fusion requires `values` to be nested under `arguments:`.
+
+**Fix:** Update the test definition in your YAML:
+```yaml
+# Before (old format — fails in Fusion)
+data_tests:
+  - accepted_values:
+      values: ['active', 'inactive']
+
+# After (correct format)
+data_tests:
+  - accepted_values:
+      arguments:
+        values: ['active', 'inactive']
+```
+
+---
+
 # Project Overview
 
 This capstone project provides the opportunity to demonstrate and improve your skills/abilities with dbt. Within this capstone, you will be presented with a data source ERD and a final ERD of the expected data model. Along with a templated dbt project, this will help you get started developing your models.

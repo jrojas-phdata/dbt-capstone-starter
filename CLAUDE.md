@@ -13,7 +13,7 @@ See [README.md](README.md) for project overview, business context, source/target
 - [docs/DBT_CONVENTIONS.md](docs/DBT_CONVENTIONS.md) — model naming, layer rules, testing requirements
 
 **Quick reference:**
-- SQL keywords/identifiers UPPER, literals lower
+- SQL keywords/functions UPPER, column identifiers lowercase, literals lower (sqlfluff CP02 enforces lowercase for column refs)
 - Leading commas, one column per line
 - CTEs over subqueries; final CTE named `final`; end with `SELECT * FROM final`
 - All aliases explicit with `AS` (≥ 3 chars)
@@ -31,7 +31,7 @@ See [README.md](README.md) for project overview, business context, source/target
 - **dev / default** → `<target_schema>_<custom_schema>` (e.g., `JSROJAS_STAGE`)
 - **ci / prod** → `<custom_schema>` directly (e.g., `STAGE`)
 
-Layer → custom schema (from `dbt_project.yml` under `models.data_vault`):
+Layer → custom schema (from `dbt_project.yml` under `models.dim_model`):
 
 | Layer | Custom schema | Dev example |
 |-------|--------------|-------------|
@@ -82,6 +82,30 @@ A local MCP server (`mcp/server.py`) is registered as `snowflake` in `.mcp.json`
 - If the user asks to modify or delete data, state the exact SQL you would run and ask for explicit confirmation before proceeding
 - Never reference CI or prod schemas (`STAGE`, `INTERMEDIATE`, `DATA_MART`) in queries — always use the dev-prefixed schemas (e.g., `JSROJAS_STAGE`) unless explicitly told otherwise
 
+## Known gotchas
+
+**`dbt_project.yml` model key must match the project name.**
+The project name is `dim_model` (see `name:` at the top of `dbt_project.yml`). The `models:` block must use the same key:
+```yaml
+models:
+  dim_model:       # ← must match name: 'dim_model'
+    staging: ...
+```
+If the key is wrong (e.g. `data_vault`), the layer configs are silently ignored and all models land in the default schema (`JROJAS`) instead of `JROJAS_STAGE` / `JROJAS_INTERMEDIATE` / `JROJAS_DATA_MART`.
+
+**`accepted_values` test syntax changed in dbt Fusion.**
+The `values` list must be nested under `arguments:`:
+```yaml
+data_tests:
+  - accepted_values:
+      arguments:
+        values: ['active', 'inactive']
+```
+Using the old format (`values:` at the top level) raises a `DbtYamlValidationError` at parse time.
+
+**A project-level `profiles.yml` overrides `~/.dbt/profiles.yml`.**
+The repo ships a gitignored template `profiles.yml` with placeholder values. If it exists in the project root, dbt reads it first and fails to connect. Delete it (it is gitignored) so dbt falls back to `~/.dbt/profiles.yml`.
+
 ## What Claude should do
 
 - Follow SQL and YAML conventions exactly as specified in `docs/`
@@ -111,7 +135,7 @@ With the base repository forked, and your dbt project set up, it is time to buil
 - [x] **1. Create a source file following our naming convention that points to our source tables**
   > **NOTE:** The sources can be found in `SANDBOX.CLASSIC_MODELS`
 
-- [ ] **2. Create a staging model for every table in our source following the naming convention above**
+- [x] **2. Create a staging model for every table in our source following the naming convention above**
   > **REMEMBER:** Staging models should just clean column names and data types.
   > **NOTE:** Make sure to also document your model in the appropriate `.yml` files, and lint every model before committing.
   > **DONE WHEN:** `dbt build --select staging` passes all tests, and `preview_dbt_model` returns rows for every staging model.

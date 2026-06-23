@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_classic_models__products
+    description: >
+      One row per product in the Classic Models catalog.
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: product_code
+        description: Natural primary key for the product (source PRODUCT_CODE).
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: Display name of the product.
+
+      - name: product_line
+        description: Foreign key to the product line category this product belongs to.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - 'Classic Cars'
+                  - 'Motorcycles'
+                  - 'Planes'
+                  - 'Ships'
+                  - 'Trains'
+                  - 'Trucks and Buses'
+                  - 'Vintage Cars'
+
+      - name: product_scale
+        description: Scale of the model (e.g., 1:18, 1:24).
+
+      - name: product_vendor
+        description: Name of the vendor who supplies the product.
+
+      - name: product_description
+        description: Detailed text description of the product.
+
+      - name: quantity_in_stock
+        description: Current inventory count for the product.
+
+      - name: buy_price
+        description: Wholesale cost of the product in USD.
+
+      - name: msrp
+        description: Manufacturer suggested retail price in USD.
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

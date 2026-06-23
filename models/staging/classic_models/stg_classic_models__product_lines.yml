@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_classic_models__product_lines
+    description: >
+      One row per product line category in the Classic Models catalog.
+      Renames source columns only — IMAGE (BINARY) column is excluded as it is not used downstream.
+    columns:
+      - name: product_line
+        description: Natural primary key for the product line (source PRODUCT_LINE).
+        data_tests:
+          - not_null
+          - unique
+
+      - name: text_description
+        description: Plain text description of the product line.
+
+      - name: html_description
+        description: HTML-formatted description of the product line.
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

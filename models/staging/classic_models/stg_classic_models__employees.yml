@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_classic_models__employees
+    description: >
+      One row per employee from the Classic Models source system.
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: employee_id
+        description: Natural primary key for the employee (source EMPLOYEE_NUMBER).
+        data_tests:
+          - not_null
+          - unique
+
+      - name: last_name
+        description: Employee last name.
+
+      - name: first_name
+        description: Employee first name.
+
+      - name: phone_extension
+        description: Internal phone extension for the employee.
+
+      - name: email
+        description: Employee email address.
+
+      - name: office_id
+        description: Foreign key to the office where the employee works.
+
+      - name: manager_employee_id
+        description: Foreign key to the employee this person reports to (self-referential).
+
+      - name: job_title
+        description: Job title of the employee.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - 'President'
+                  - 'VP Sales'
+                  - 'VP Marketing'
+                  - 'Sales Manager (NA)'
+                  - 'Sales Manager (APAC)'
+                  - 'Sale Manager (EMEA)'
+                  - 'Sales Rep'
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.
