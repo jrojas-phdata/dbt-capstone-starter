@@ -6,6 +6,9 @@ name: 'dim_model'
 version: '1.0.0'
 config-version: 2
 
+dbt-cloud:
+    project-id: 554834
+
 # This setting configures which "profile" dbt uses for this project.
 profile: 'default'
 
@@ -30,19 +33,22 @@ seeds:
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 models:
-  data_vault:
+  dim_model:
     staging:
       +materialized: view
       +database: "sandbox"
       +schema: "stage"
+      +access: private
     intermediate:
       +materialized: table
       +database: "sandbox"
       +schema: "intermediate"
+      +access: private
     marts:
       +materialized: table
       +database: "sandbox"
       +schema: "data_mart"
+      +access: public
   dbt_project_evaluator:
     +database: "sandbox"
     +schema: "dbt_project_evaluator"

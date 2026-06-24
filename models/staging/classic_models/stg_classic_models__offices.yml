@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_classic_models__offices
+    description: >
+      One row per office location from the Classic Models source system.
+      Renames and casts source columns only — no business logic.
+    columns:
+      - name: office_id
+        description: Natural primary key for the office (source OFFICE_CODE).
+        data_tests:
+          - not_null
+          - unique
+
+      - name: city
+        description: City where the office is located.
+
+      - name: phone
+        description: Office phone number.
+
+      - name: address_line_1
+        description: Primary street address line.
+
+      - name: address_line_2
+        description: Secondary street address line.
+
+      - name: state
+        description: State or province where the office is located.
+
+      - name: country
+        description: Country where the office is located.
+
+      - name: postal_code
+        description: Postal or ZIP code of the office address.
+
+      - name: territory
+        description: Sales territory associated with the office.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['APAC', 'EMEA', 'Japan', 'NA']
+
+      - name: synced_at
+        description: Timestamp when this record was last synced from the source system.

@@ -1,0 +1,83 @@
+name: dbt Slim CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'models/**'
+      - 'tests/**'
+      - 'macros/**'
+      - 'seeds/**'
+      - 'snapshots/**'
+      - 'dbt_project.yml'
+      - 'packages.yml'
+
+jobs:
+  dbt-slim-ci:
+    name: Run changed models
+    runs-on: ubuntu-latest
+
+    env:
+      DBT_PROFILES_DIR: ${{ github.workspace }}
+      DBT_TARGET: ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: |
+          pip install --upgrade pip
+          pip install dbt-snowflake
+
+      - name: Write profiles.yml
+        run: |
+          cat > profiles.yml <<EOF
+          default:
+            target: ci
+            outputs:
+              ci:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                role: ${{ secrets.SNOWFLAKE_ROLE }}
+                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+                database: ${{ secrets.SNOWFLAKE_DATABASE }}
+                schema: CI_${{ github.event.pull_request.number }}
+                threads: 4
+          EOF
+
+      - name: Install dbt packages
+        run: dbt deps
+
+      - name: Get production manifest
+        run: |
+          # Download the latest production manifest for slim CI comparison
+          # Replace this URL with your actual artifact storage location
+          curl -f -o manifest.json "${{ secrets.PROD_MANIFEST_URL }}" || echo "No production manifest found, running full build"
+
+      - name: dbt build (changed models only)
+        run: |
+          if [ -f manifest.json ]; then
+            dbt build --select state:modified+ --defer --state . --exclude tag:skip_ci
+          else
+            dbt build --exclude tag:skip_ci
+          fi
+
+      - name: Run dbt project evaluator
+        run: dbt build --select package:dbt_project_evaluator --store-failures
+
+      - name: dbt source freshness
+        run: dbt source freshness || true
+
+      - name: Cleanup CI schema
+        if: always()
+        run: |
+          dbt run-operation drop_schema --args "{'schema': 'CI_${{ github.event.pull_request.number }}'}" || true

@@ -51,4 +51,3 @@ aliasing = explicit
 
 [sqlfluff:rules:aliasing.length]
 min_alias_length = 3
-

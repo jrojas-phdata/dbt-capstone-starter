@@ -1,0 +1,54 @@
+repos:
+  # General file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # SQL linting
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.1.0
+    hooks:
+      - id: sqlfluff-lint
+        name: sqlfluff lint
+        additional_dependencies: [dbt-snowflake, sqlfluff-templater-dbt]
+        args: [--dialect=snowflake]
+      - id: sqlfluff-fix
+        name: sqlfluff fix
+        additional_dependencies: [dbt-snowflake, sqlfluff-templater-dbt]
+        args: [--dialect=snowflake, --force]
+
+  # YAML formatting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-d, '{extends: relaxed, rules: {line-length: {max: 120}}}']
+        exclude: '.github/workflows/.*'
+
+  # dbt model/YAML checks
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v2.0.4
+    hooks:
+      - id: dbt-parse
+        name: dbt parse
+      - id: check-model-has-properties-file
+        name: check model has properties file
+      - id: check-model-has-description
+        name: check model has description
+      - id: check-model-name-contract
+        name: check model name contract
+        args: [--pattern, '^(stg_|int_|dim_|fct_|mart_)']
+        files: '^models/'
+      - id: check-source-has-loader
+        name: check source has loader
+      - id: check-source-columns-have-desc
+        name: check source columns have descriptions

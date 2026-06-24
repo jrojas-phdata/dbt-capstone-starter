@@ -53,3 +53,9 @@ logs
 target
 dbt_packages
 profiles.yml
+dbt_internal_packages/
+
+# MCP server
+mcp/__pycache__/
+mcp/.venv/
+mcp/.python-version
